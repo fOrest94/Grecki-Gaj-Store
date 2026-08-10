@@ -1,8 +1,5 @@
 import "dotenv/config";
 import { randomBytes } from "node:crypto";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import fastifyStatic from "@fastify/static";
 import bcrypt from "bcryptjs";
 import {
   and,
@@ -54,14 +51,7 @@ import { getPublicContent } from "./modules/content/application/public-content";
 import { runRetention, scheduleDailyRetention } from "./retention";
 import { createApp } from "./app";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 const app = await createApp();
-
-await app.register(fastifyStatic, {
-  root: join(__dirname, "../dist/client"),
-  prefix: "/",
-});
 
 const apiPort = Number(process.env.PORT || process.env.API_PORT || 4000);
 const apiHost = process.env.API_HOST || "0.0.0.0";

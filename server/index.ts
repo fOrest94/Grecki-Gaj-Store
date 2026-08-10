@@ -1,5 +1,7 @@
 import "dotenv/config";
 import { randomBytes } from "node:crypto";
+import { join } from "node:path";
+import fastifyStatic from "@fastify/static";
 import bcrypt from "bcryptjs";
 import {
   and,
@@ -52,6 +54,12 @@ import { runRetention, scheduleDailyRetention } from "./retention";
 import { createApp } from "./app";
 
 const app = await createApp();
+
+await app.register(fastifyStatic, {
+  root: join(import.meta.dir, "../dist/client"),
+  prefix: "/",
+});
+
 const apiPort = Number(process.env.PORT || process.env.API_PORT || 4000);
 const apiHost = process.env.API_HOST || "0.0.0.0";
 const frontendOrigin = process.env.FRONTEND_ORIGIN || "http://localhost:3000";

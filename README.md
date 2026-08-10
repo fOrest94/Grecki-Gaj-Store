@@ -137,3 +137,17 @@ Frontend zbuduj po ustawieniu `NEXT_PUBLIC_API_URL` na publiczny adres API i
 uruchom przez `npm run build` oraz `npm run start`. Po pierwszym wdrozeniu
 utworz konto administratora przez jednorazowy, bezpieczny seed zamiast uzywac
 danych demonstracyjnych z lokalnego srodowiska.
+
+### Jedna usluga (frontend + API razem)
+
+Jesli wdrazasz frontend i API jako jeden proces na jednym porcie, ustaw
+komende startowa uslugi na:
+
+```text
+npm run start:production
+```
+
+Ten skrypt uruchamia migracje bazy danych, buduje frontend Next.js
+(`npm run build`) i dopiero potem startuje serwer Fastify (`npm run start:api`).
+Dzieki temu build zawsze powstaje przed startem API i unikamy bledu 404 na
+stronie glownej wynikajacego z braku zbudowanych plikow frontendu.

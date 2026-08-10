@@ -13,6 +13,7 @@
     "start": "vinext start",
     "start:api": "tsx server/index.ts",
     "start:api:production": "npm run db:migrate && npm run start:api",
+    "start:production": "npm run db:migrate && npm run build && npm run start:api",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern examples --ignore-pattern worker",
     "typecheck": "tsc --noEmit",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@fastify/cookie": "^11.1.2",
     "@fastify/cors": "^11.3.0",
+    "@fastify/static": "^8.2.0",
     "bcryptjs": "^3.0.3",
     "concurrently": "^10.0.4",
     "dotenv": "^17.4.2",

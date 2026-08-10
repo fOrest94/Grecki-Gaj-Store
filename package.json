@@ -1,0 +1,61 @@
+{
+  "name": "grecki-gaj-store",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "concurrently -n WEB,API -c green,cyan \"vinext dev\" \"tsx watch server/index.ts\"",
+    "dev:web": "vinext dev",
+    "dev:api": "tsx watch server/index.ts",
+    "build": "vinext build",
+    "start": "vinext start",
+    "start:api": "tsx server/index.ts",
+    "start:api:production": "npm run db:migrate && npm run start:api",
+    "test": "npm run build && node --test tests/rendered-html.test.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern examples --ignore-pattern worker",
+    "typecheck": "tsc --noEmit",
+    "db:up": "docker compose up -d database",
+    "db:down": "docker compose down",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx server/migrate.ts",
+    "db:seed": "tsx server/seed.ts",
+    "db:retention": "tsx server/run-retention.ts"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/cors": "^11.3.0",
+    "bcryptjs": "^3.0.3",
+    "concurrently": "^10.0.4",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "0.45.2",
+    "fastify": "^5.11.2",
+    "lucide-react": "^1.28.0",
+    "next": "16.2.6",
+    "postgres": "^3.4.9",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "tsx": "^4.23.8",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "react-server-dom-webpack": "19.2.6",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vinext": "0.0.50",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
+  },
+  "type": "module"
+}

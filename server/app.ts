@@ -34,43 +34,29 @@ export async function createApp() {
 }
 
 /**
- * Serves the built Next.js frontend (`.next/`) from the Fastify server so a
- * single service can answer both API requests and the storefront UI.
+ * Serves the built Vinext (Vite) frontend (`dist/`) from the Fastify server
+ * so a single service can answer both API requests and the storefront UI.
  *
- * - `.next/static/*` is served under `/_next/static/*` with long-lived,
- *   immutable caching, matching how Next.js expects those assets to be
- *   requested by the built HTML/JS.
- * - `.next/public/*` (Next's copy of the top-level `public/` directory, e.g.
- *   favicon, images) is served from the site root with short-lived caching.
+ * - `dist/client/*` (Vite's client build output — JS, CSS, and other
+ *   assets) is served from the site root with short-lived caching.
  * - Any other GET request that isn't already handled by an API route and
- *   isn't a static asset falls back to the built `index.html`, so
- *   client-side routing keeps working (SPA-style fallback).
+ *   isn't a static asset falls back to the built `index.html` in
+ *   `dist/client/`, so client-side routing keeps working (SPA-style
+ *   fallback).
  */
 async function registerFrontend(app: FastifyInstance) {
-  const nextDir = join(process.cwd(), ".next");
-  const staticDir = join(nextDir, "static");
-  const publicDir = join(nextDir, "public");
-  const indexHtmlPath = join(nextDir, "index.html");
+  const distDir = join(process.cwd(), "dist");
+  const clientDir = join(distDir, "client");
+  const indexHtmlPath = join(clientDir, "index.html");
 
-  if (!existsSync(nextDir)) {
-    app.log.warn(".next directory not found; frontend will not be served");
+  if (!existsSync(distDir)) {
+    app.log.warn("dist directory not found; frontend will not be served");
     return;
   }
 
-  if (existsSync(staticDir)) {
+  if (existsSync(clientDir)) {
     await app.register(fastifyStatic, {
-      root: staticDir,
-      prefix: "/_next/static/",
-      decorateReply: false,
-      cacheControl: true,
-      maxAge: "1y",
-      immutable: true,
-    });
-  }
-
-  if (existsSync(publicDir)) {
-    await app.register(fastifyStatic, {
-      root: publicDir,
+      root: clientDir,
       prefix: "/",
       decorateReply: false,
       cacheControl: true,

@@ -25,6 +25,7 @@ import {
 } from "../app/data";
 
 const isProduction = process.env.NODE_ENV === "production";
+const includeDemoData = process.env.SEED_DEMO_DATA === "true";
 
 function slugify(value: string) {
   return value
@@ -49,7 +50,6 @@ async function seedUsers() {
   }
 
   const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
-  const customerPasswordHash = await bcrypt.hash("Klient123!", 12);
   const now = new Date();
 
   const [admin] = await db
@@ -73,12 +73,26 @@ async function seedUsers() {
     })
     .returning();
 
-  if (isProduction) return { admin, customer: null };
+  if (isProduction && !includeDemoData) return { admin, customer: null };
+
+  const customerEmail =
+    process.env.SEED_DEMO_CUSTOMER_EMAIL || "anna@greckigaj.local";
+  const customerPassword =
+    process.env.SEED_DEMO_CUSTOMER_PASSWORD ||
+    (isProduction ? "" : "Klient123!");
+
+  if (!customerPassword) {
+    throw new Error(
+      "Demo data requires SEED_DEMO_CUSTOMER_PASSWORD in production.",
+    );
+  }
+
+  const customerPasswordHash = await bcrypt.hash(customerPassword, 12);
 
   const [customer] = await db
     .insert(users)
     .values({
-      email: "anna@greckigaj.local",
+      email: customerEmail,
       firstName: "Anna",
       lastName: "Nowak",
       passwordHash: customerPasswordHash,
@@ -385,7 +399,7 @@ try {
   if (customer) await seedDemoOrder(customer.id, seededProducts);
   console.log("Dane demonstracyjne Greckiego Gaju zostały zapisane.");
   console.log(`Administrator: ${admin.email}`);
-  if (customer) console.log("Klient: anna@greckigaj.local / Klient123!");
+  if (customer) console.log(`Klient demonstracyjny: ${customer.email}`);
 } finally {
   await closeDatabase();
 }

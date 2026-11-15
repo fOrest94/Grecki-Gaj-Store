@@ -123,15 +123,32 @@ FRONTEND_ORIGIN=https://adres-frontendu
 SESSION_COOKIE=gg_session
 SEED_ADMIN_EMAIL=admin@twojadomena.pl
 SEED_ADMIN_PASSWORD=dlugie-losowe-haslo
+# Opcjonalnie, tylko do demonstracji panelu zamówień:
+SEED_DEMO_DATA=true
+SEED_DEMO_CUSTOMER_EMAIL=demo@twojadomena.pl
+SEED_DEMO_CUSTOMER_PASSWORD=inne-dlugie-losowe-haslo
 ```
 
-Komenda startowa API:
+Na Railway uruchom jednorazowo na usłudze API:
 
 ```text
 npm run db:migrate
 npm run db:seed
-npm run start:api
 ```
+
+Możesz tymczasowo ustawić komendę startową na:
+
+```text
+npm run db:bootstrap && npm run start:api
+```
+
+Po udanym wdrożeniu zmień ją z powrotem na `npm run start:api:production`,
+żeby kolejne restarty wykonywały tylko migracje i uruchamiały API. Seed jest
+idempotentny, ale nie powinien być częścią każdego restartu produkcji.
+
+Ustaw `SEED_DEMO_DATA=true` tylko wtedy, gdy chcesz zobaczyć przykładowego
+klienta i zamówienie w panelu administratora. Dla zwykłego startu produkcji
+pozostaw tę zmienną wyłączoną.
 
 Frontend zbuduj po ustawieniu `NEXT_PUBLIC_API_URL` na publiczny adres API i
 uruchom przez `npm run build` oraz `npm run start`. Po pierwszym wdrozeniu

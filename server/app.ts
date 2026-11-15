@@ -45,6 +45,39 @@ export async function createApp() {
  *   fallback).
  */
 async function registerFrontend(app: FastifyInstance) {
+  const webUrl = process.env.FRONTEND_INTERNAL_URL;
+  if (webUrl) {
+    // Vinext is server-rendered (no static index.html), so forward every
+    // request not handled by an API route to the `vinext start` process.
+    app.setNotFoundHandler(async (request, reply) => {
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        return reply.code(404).send({ error: "Not found." });
+      }
+      try {
+        const upstream = await fetch(webUrl + request.url, {
+          method: request.method,
+          headers: {
+            "x-forwarded-host": request.headers.host ?? "",
+            "x-forwarded-proto": "https",
+            accept: request.headers.accept ?? "*/*",
+            "accept-encoding": "identity",
+          },
+        });
+        reply.code(upstream.status);
+        upstream.headers.forEach((value, key) => {
+          if (!["content-length", "content-encoding", "transfer-encoding", "connection"].includes(key)) {
+            reply.header(key, value);
+          }
+        });
+        return reply.send(Buffer.from(await upstream.arrayBuffer()));
+      } catch (error) {
+        app.log.error(error);
+        return reply.code(502).send({ error: "Frontend unavailable." });
+      }
+    });
+    return;
+  }
+
   const distDir = join(process.cwd(), "dist");
   const clientDir = join(distDir, "client");
   const indexHtmlPath = join(clientDir, "index.html");

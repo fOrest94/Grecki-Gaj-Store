@@ -13,6 +13,7 @@
     "start": "vinext start",
     "start:api": "tsx server/index.ts",
     "start:api:production": "npm run db:migrate && npm run start:api",
+    "start:web-api": "concurrently -k -n WEB,API \"vinext start -p 3000 -H 127.0.0.1\" \"tsx server/index.ts\"",
     "start:production": "npm run db:migrate && npm run build && npm run start:api",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern examples --ignore-pattern worker",
